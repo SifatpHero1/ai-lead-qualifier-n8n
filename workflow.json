@@ -1,0 +1,285 @@
+{
+  "name": "Lead Qualifier with Gemini",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-qualifier",
+        "options": {}
+      },
+      "id": "60329438-6257-4914-9c0f-67cc70108fec",
+      "name": "Lead Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "6415b4be-0075-4941-9396-0a4464f11836"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "models/gemini-2.5-flash",
+          "cachedResultName": "Gemini 2.5 Flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Lead details:\nName: {{ $json.body.name }}\nCompany: {{ $json.body.company }}\nMessage: {{ $json.body.message }}\n\nQualify this lead (is it a genuine, relevant sales opportunity?) and write a short, personalized reply to the lead. Respond ONLY with valid JSON in this exact format: {\"qualified\": \"Yes\" or \"No\", \"reason\": \"short explanation\", \"reply\": \"personalized reply text\"}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": false,
+          "urlContext": false,
+          "codeExecution": false
+        },
+        "options": {
+          "maxOutputTokens": 1024,
+          "temperature": 0.4
+        }
+      },
+      "id": "c830ebc6-3434-4f9f-b082-ccc95a272666",
+      "name": "Qualify Lead with Gemini",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "Date",
+              "type": "string",
+              "value": "={{ $now.toFormat(\"yyyy-MM-dd HH:mm\") }}"
+            },
+            {
+              "id": "a2",
+              "name": "Name",
+              "type": "string",
+              "value": "={{ $(\"Lead Webhook\").item.json.body.name }}"
+            },
+            {
+              "id": "a3",
+              "name": "Company",
+              "type": "string",
+              "value": "={{ $(\"Lead Webhook\").item.json.body.company }}"
+            },
+            {
+              "id": "a4",
+              "name": "Message",
+              "type": "string",
+              "value": "={{ $(\"Lead Webhook\").item.json.body.message }}"
+            },
+            {
+              "id": "a5",
+              "name": "Qualified",
+              "type": "string",
+              "value": "={{ JSON.parse(String($json.content?.parts?.[0]?.text ?? $json.text ?? \"{}\").replace(/```json|```/g, \"\").trim()).qualified }}"
+            },
+            {
+              "id": "a6",
+              "name": "Reason",
+              "type": "string",
+              "value": "={{ JSON.parse(String($json.content?.parts?.[0]?.text ?? $json.text ?? \"{}\").replace(/```json|```/g, \"\").trim()).reason }}"
+            },
+            {
+              "id": "a7",
+              "name": "AI_Reply",
+              "type": "string",
+              "value": "={{ JSON.parse(String($json.content?.parts?.[0]?.text ?? $json.text ?? \"{}\").replace(/```json|```/g, \"\").trim()).reply }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0bda862e-6693-4110-bc14-e868eadb88f6",
+      "name": "Parse AI Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ND364_pyPEZoh5M2oZTWLm_KJVbdkmPVN1yN7HZ0mcU",
+          "mode": "list",
+          "cachedResultName": "Lead Qualifier",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ND364_pyPEZoh5M2oZTWLm_KJVbdkmPVN1yN7HZ0mcU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ND364_pyPEZoh5M2oZTWLm_KJVbdkmPVN1yN7HZ0mcU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.Date }}",
+            "Name": "={{ $json.Name }}",
+            "Company": "={{ $json.Company }}",
+            "Message": "={{ $json.Message }}",
+            "Qualified": "={{ $json.Qualified }}",
+            "Reason": "={{ $json.Reason }}",
+            "AI_Reply": "={{ $json.AI_Reply }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Qualified",
+              "displayName": "Qualified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI_Reply",
+              "displayName": "AI_Reply",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "143a2da9-e1ff-4322-be27-3bdbf1478951",
+      "name": "Append to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "x7T7yadMblXK3SVR",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Lead Webhook": {
+      "main": [
+        [
+          {
+            "node": "Qualify Lead with Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualify Lead with Gemini": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Result": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3ad7161b-1874-4c6d-9edd-05b3817be7e7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc63139d60e3a9bd98306463a80250dd732c0880defa1a65db7ae5666d82a62e"
+  },
+  "nodeGroups": [],
+  "id": "fZ2rMRyntyk1MBzo",
+  "tags": []
+}
