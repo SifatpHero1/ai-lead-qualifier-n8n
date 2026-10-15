@@ -4,7 +4,7 @@ An automated n8n workflow that uses Google Gemini Flash to instantly qualify inb
 
 ## 🛠️ Tools Used
 - **n8n** (Workflow Automation)
-- **Google Gemini 1.5 Flash** (Fast, cost-effective LLM for structured JSON)
+- **Google Gemini 2.5 Flash** (Fast, cost-effective LLM for structured JSON)
 - **Google Sheets** (Data logging)
 
 ## ⚙️ How It Works
