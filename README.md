@@ -20,5 +20,3 @@ An automated n8n workflow that uses Google Gemini Flash to instantly qualify inb
 ### 2. Google Sheets Output
 ![Sheet Result](sheet-result.png)
 
----
-*Built for the AI Automation Engineer role application at Growbig100.*
